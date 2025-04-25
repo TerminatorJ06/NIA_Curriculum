@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nitte Institute of Architecture B.Arch CO-PO Mapping</title>
+    <style>
+        :root {
+            --bondi-blue: #0095B6;
+            --light-grey: #f4f4f4;
+            --white: #ffffff;
+            --dark-grey: #333;
+            --soft-mint: #a7d9c3; /* Pastel for Indirectly Related (1) */
+            --pale-green: #98fb98; /* Pastel for Directly Related (2) */
+            --light-grey-text: #888; /* For Unrelated (0 or empty) */
+            --border-color: #ddd;
+            --delete-red: #e74c3c;
+            --add-green: #2ecc71;
+            --edit-orange: #f39c12;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.5;
+            margin: 0;
+            background-color: var(--light-grey);
+            color: var(--dark-grey);
+            font-size: 0.85em; /* Smaller text size */
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2, h3 {
+            color: var(--bondi-blue);
+            border-bottom: 2px solid rgba(0, 149, 182, 0.2);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        h3 {
+             font-size: 1.1em;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--bondi-blue);
+             font-size: 0.9em;
+        }
+
+        select, input[type="text"], textarea {
+            padding: 8px; /* Slightly smaller padding */
+            font-size: 0.85em; /* Match body text size */
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 15px;
+            width: calc(100% - 18px); /* Adjust for padding and border */
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+         select {
+             width: auto; /* Auto width for dropdown */
+             min-width: 250px; /* Ensure enough width */
+         }
+
+        input[type="text"]:focus, textarea:focus {
+            border-color: var(--bondi-blue);
+            outline: none;
+        }
+
+        button {
+            background-color: var(--bondi-blue);
+            color: white;
+            padding: 8px 12px; /* Slightly smaller padding */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em; /* Match body text size */
+            transition: background-color 0.3s ease;
+            margin-right: 5px;
+        }
+
+        button:hover {
+            background-color: #007a99; /* Darker Bondi Blue */
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--light-grey);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .section h3 {
+             margin-top: 0;
+             padding-bottom: 5px;
+        }
+
+
+        #mapping-area {
+            margin-top: 30px;
+        }
+
+        #mapping-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            table-layout: fixed; /* Crucial for fixed column widths */
+        }
+
+        #mapping-table th, #mapping-table td {
+            border: 1px solid var(--border-color);
+            padding: 8px; /* Consistent padding */
+            text-align: left;
+            vertical-align: top;
+            word-wrap: break-word; /* Wrap long text */
+        }
+
+        #mapping-table th {
+            background-color: var(--bondi-blue);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            font-weight: normal;
+        }
+
+        /* Column Widths */
+        #mapping-table th:nth-child(1), /* CO Code Header */
+        #mapping-table td:nth-child(1) { /* CO Code Cells */
+            width: 10%;
+            max-width: 80px; /* Keep a max width to prevent it from getting too wide on small screens */
+        }
+        #mapping-table th:nth-child(2), /* CO Description Header */
+        #mapping-table td:nth-child(2) { /* CO Description Cells */
+            width: 40%;
+        }
+
+        #mapping-table th:nth-child(n+3):nth-child(-n+9), /* PO Headers (3rd to 9th column) */
+        #mapping-table td:nth-child(n+3):nth-child(-n+9) { /* PO Cells */
+            width: 8%; /* 7 * 8% = 56% */
+            text-align: center;
+            cursor: pointer; /* Indicate clickability for editing */
+        }
+        #mapping-table th:nth-child(10), /* Delete Column Header (empty) */
+        #mapping-table td:nth-child(10) { /* Delete Cells */
+            width: 5%; /* Remaining 5% */
+            max-width: 40px; /* Keep a max width */
+            text-align: center;
+        }
+
+
+        #mapping-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        #mapping-table tbody tr:hover {
+            background-color: #e0e0e0;
+        }
+
+
+        /* Styling for mapping levels */
+        .mapping-0 {
+             color: var(--light-grey-text);
+        }
+         .mapping-0::before { content: '-'; } /* Display '-' for unrelated */
+
+        .mapping-1 {
+            background-color: var(--soft-mint);
+            color: var(--dark-grey);
+            font-weight: bold;
+        }
+        .mapping-2 {
+            background-color: var(--pale-green);
+            color: var(--dark-grey);
+            font-weight: bold;
+        }
+
+        /* Style for contenteditable cells */
+        td[contenteditable="true"] {
+            border: 1px dashed transparent; /* Default state */
+             outline: none;
+        }
+         td[contenteditable="true"]:hover {
+             border-color: rgba(0, 149, 182, 0.5); /* Subtle dashed border on hover */
+         }
+        td[contenteditable="true"]:focus {
+             border-color: var(--bondi-blue); /* Bondi blue dashed border on focus */
+        }
+        td[contenteditable="true"]:empty::before {
+             content: attr(data-placeholder);
+             color: #aaa;
+        }
+
+        .editable-po-desc span[contenteditable="true"] {
+            border-bottom: 1px dashed var(--bondi-blue); /* Indicate editability */
+            cursor: text;
+        }
+         .editable-po-desc span[contenteditable="true"]:focus {
+             outline: none; /* Remove default outline */
+         }
+
+
+        .legend {
+            margin-top: 30px;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 20px;
+        }
+        .legend p {
+            margin: 5px 0;
+            padding-left: 20px;
+            font-size: 0.9em;
+        }
+         .legend p::before {
+             content: '';
+             display: inline-block;
+             width: 15px;
+             height: 15px;
+             margin-right: 10px;
+             vertical-align: middle;
+             border-radius: 3px;
+         }
+         .legend p:nth-child(1)::before { background-color: transparent; border: 1px solid var(--light-grey-text); }
+         .legend p:nth-child(2)::before { background-color: var(--soft-mint); }
+         .legend p:nth-child(3)::before { background-color: var(--pale-green); }
+
+
+        .po-descriptions {
+            margin-top: 30px;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 20px;
+        }
+        .po-descriptions ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .po-descriptions li {
+            margin-bottom: 15px;
+            padding-left: 15px;
+            position: relative;
+             font-size: 0.9em;
+        }
+         .po-descriptions li::before {
+             content: '\2022';
+             color: var(--bondi-blue);
+             font-weight: bold;
+             display: inline-block;
+             width: 1em;
+             margin-left: -1em;
+         }
+        .po-descriptions li strong {
+            color: var(--dark-grey);
+            min-width: 60px;
+            display: inline-block;
+        }
+
+        .note-section textarea {
+            min-height: 100px;
+            resize: vertical;
+            width: 100%; /* Make textarea fill width */
+             box-sizing: border-box;
+        }
+
+        .button-group {
+            margin-top: 20px;
+             display: flex;
+             gap: 10px;
+             flex-wrap: wrap; /* Allow buttons to wrap on small screens */
+        }
+
+        .add-co-row td {
+            background-color: rgba(46, 204, 113, 0.1); /* Using rgba for pastel effect */
+        }
+        .delete-co-btn {
+             background-color: var(--delete-red);
+             padding: 5px 8px;
+             font-size: 0.8em;
+             margin: 0;
+             float: right;
+             margin-left: 10px;
+        }
+        .delete-co-btn:hover {
+             background-color: #c0392b;
+        }
+
+        /* Specific button colors */
+        #add-co-btn { background-color: var(--add-green); }
+        #add-co-btn:hover { background-color: #27ae60; }
+        #edit-po-desc-btn { background-color: var(--edit-orange); }
+        #edit-po-desc-btn:hover { background-color: #e67e22; }
+        #clear-data-btn { background-color: var(--delete-red); }
+        #clear-data-btn:hover { background-color: #c0392b; }
+
+         /* Status message color controlled by JS now */
+        #save-status {
+             min-height: 1.2em; /* Reserve space */
+        }
+
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Nitte Institute of Architecture B.Arch CO-PO Mapping</h1>
+
+    <div class="section">
+        <h3>Manage Courses</h3>
+        <label for="course-select">Select Course:</label>
+        <select id="course-select">
+            <option value="">--Select Course--</option>
+            <!-- Options will be populated by JS -->
+        </select>
+
+        <div class="button-group">
+             <button id="add-course-btn">Add New Course</button>
+             <button id="delete-course-btn" disabled>Delete Selected Course</button>
+        </div>
+
+        <div id="add-course-form" style="display: none; margin-top: 20px;">
+             <hr style="margin-bottom: 20px; border-color: rgba(0, 149, 182, 0.2);">
+             <h4>Add New Course Details</h4>
+             <label for="new-course-code">Course Code:</label>
+             <input type="text" id="new-course-code" placeholder="e.g., 20BAR1016" required>
+             <label for="new-course-title">Course Title:</label>
+             <input type="text" id="new-course-title" placeholder="e.g., Advanced Topics in Architecture" required>
+             <button id="save-new-course-btn">Save Course</button>
+             <button id="cancel-add-course-btn">Cancel</button>
+        </div>
+    </div>
+
+    <div id="mapping-area">
+        <h2>CO-PO Mapping for <span id="selected-course-title">Selected Course</span></h2>
+        <table id="mapping-table">
+            <thead>
+                <tr>
+                    <th>CO Code</th>
+                    <th>CO Description <button id="add-co-btn" style="float: right; margin: -4px 0; background-color: var(--add-green);">Add CO</button></th>
+                    <th>PO1</th><th>PO2</th><th>PO3</th><th>PO4</th><th>PO5</th><th>PO6</th><th>PO7</th>
+                    <th></th> <!-- Empty header for delete column -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Mapping rows will be populated by JS -->
+                 <tr>
+                     <td colspan="10" style="text-align: center;">Please select a course from the dropdown above.</td>
+                 </tr>
+            </tbody>
+        </table>
+
+        <div class="legend">
+            <h3>Levels of Relation:</h3>
+            <p><span class="mapping-0">-</span> Unrelated</p>
+            <p><span class="mapping-1">1</span> Indirectly Related</p>
+            <p><span class="mapping-2">2</span> Directly Related</p>
+        </div>
+    </div>
+
+    <div class="section po-descriptions">
+        <h3>Program Outcomes (POs) <button id="edit-po-desc-btn" style="float: right; margin: -4px 0; background-color: var(--edit-orange);">Edit POs</button></h3>
+        <ul id="po-list">
+            <!-- PO descriptions populated by JS -->
+        </ul>
+    </div>
+
+    <div class="section note-section">
+        <h3>Notes</h3>
+        <textarea id="notes-textarea" placeholder="Add any relevant notes here..."></textarea>
+    </div>
+
+    <div class="section">
+        <h3>Data Management</h3>
+        <div class="button-group">
+             <button id="save-data-btn">Save All Data</button>
+             <button id="load-data-btn">Load Saved Data</button>
+             <button id="clear-data-btn" style="background-color: var(--delete-red);">Clear All Data</button>
+        </div>
+        <p id="save-status" style="margin-top: 10px;"></p>
+    </div>
+
+</div>
+
+<script>
+    // --- Data Storage (Initial State - will be overwritten by localStorage if data exists) ---
+    // Define default data structure
+     const poDescriptionsDefault = {
+        'PO1': 'Understand: Knowledge of the architect’s role in the construction industry, in society, and the professional qualities required for the practice of architecture.',
+        'PO2': 'Communicate: Ability to determine appropriate communication methods and media to test, analyse, critically appraise and explain ideas clearly and effectively.',
+        'PO3': 'Apply: Ability to integrate the humanities, the social and the physical sciences, technology, environmental sciences, the creative arts, and the liberal arts in the building construction process to generate workable and sustainable architectural design solutions.',
+        'PO4': 'Apply: Capacity to develop a design program, and to be able to conceptualise, design, understand and realise the act of building within a context of the practice of architecture which balances the tensions between emotion, reason and intuition, and which gives physical form to the needs of society and the individual.',
+        'PO5': 'Analyse: Knowledge of the history and theories of architecture and the related arts, technologies and human sciences, and their influence on the spatial, social, and technological aspects of architecture.',
+        'PO6': 'Evaluate: Critical thinking and problem solving, professional judgement, and ability to take the initiative and make appropriate decisions, prioritising resilience, ecological sustainability, and design for reduced use of energy, as well as passive systems and their management.',
+        'PO7': 'Create: Ability to evaluate evidence, arguments and assumptions in order to make and present sound judgments within a structured discourse, and produce clear, logically argued and original work relating to architectural culture, theory and design.'
+    };
+
+     // Note: Added unique 'id' to each CO object to make mapping persistent across edits/adds/deletes
+    const coursesDataDefault = [
+        {
+            code: '20BAR11', title: 'Foundation Studio',
+            cos: [
+                { id: 'cos1', code: 'CO1', description: 'Able to associate and express the relationship of Body with Object' },
+                { id: 'cos2', code: 'CO2', description: 'Able to define the interrelationship of form, structure, and material in a natural and man-made object' },
+                { id: 'cos3', code: 'CO3', description: 'Able to conceptualize architectural ideas by deducing from design theory and other liberal art forms' },
+                { id: 'cos4', code: 'CO4', description: 'Able to generate design through structured conceptual ideas' },
+                { id: 'cos5', code: 'CO5', description: 'Able to use drawings and physical models to conceive, organize and develop an Object.' }
+            ],
+            mapping: {
+                'cos1': { 'PO1': '1', 'PO2': '', 'PO3': '', 'PO4': '', 'PO5': '', 'PO6': '', 'PO7': '' },
+                'cos2': { 'PO1': '1', 'PO2': '', 'PO3': '1', 'PO4': '', 'PO5': '2', 'PO6': '', 'PO7': '1' },
+                'cos3': { 'PO1': '', 'PO2': '', 'PO3': '1', 'PO4': '', 'PO5': '2', 'PO6': '2', 'PO7': '2' },
+                'cos4': { 'PO1': '1', 'PO2': '', 'PO3': '', 'PO4': '2', 'PO5': '', 'PO6': '', 'PO7': '' },
+                'cos5': { 'PO1': '', 'PO2': '', 'PO3': '', 'PO4': '', 'PO5': '1', 'PO6': '2', 'PO7': '2' }
+            }
+        },
+        {
+            code: '20BAR12', title: 'Culturescapes',
+            cos: [
+                { id: 'cos6', code: 'CO1', description: 'Students will recognize religion as a generator of architectural traditions.' },
+                { id: 'cos7', code: 'CO2', description: 'Students will identify the role of patronage in the creation of cultural fabric.' },
+                { id: 'cos8', code: 'CO3', description: 'Students will examine the diverse architectural impacts of trade and conquest leading to new architectural programs, new building types, the formation of cosmopolitan and or port towns, & shifts in domestic architecture. They will also discuss the reverse flow of ideas from the conquered territories to other places within the established networks.' }
+            ],
+            mapping: {
+                'cos6': { 'PO1': '1', 'PO2': '', 'PO3': '1', 'PO4': '1', 'PO5': '', 'PO6': '', 'PO7': '' },
+                'cos7': { 'PO1': '1', 'PO2': '2', 'PO3': '1', 'PO4': '1', 'PO5': '1', 'PO6': '', 'PO7': '1' },
+                'cos8': { 'PO1': '', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '1', 'PO7': '1' }
+            }
+        },
+        {
+            code: '20BAR13', title: 'Environment and Building Physics',
+            cos: [
+                { id: 'cos9', code: 'CO1', description: 'To comprehend the importance of the natural environment, identify the issues concerned with it, and further develop an understanding of designing built forms with nature.' },
+                { id: 'cos10', code: 'CO2', description: 'Understand the evolution of primary building materials and be able to use these natural materials to create sustainable built environments that will adapt themselves to the surrounding environment.' },
+                { id: 'cos11', code: 'CO3', description: 'The overall basics of building construction and technology by familiarizing in detail - the process of building construction, building components, various materials, skills, and types of equipment used in making them.' },
+                { id: 'cos12', code: 'CO4', description: 'The Structural components, Geometrical properties, Force systems, Equilibrium conditions, Loads & Basic stresses determine the principles of structural systems as an integral part of the architecture.' },
+                { id: 'cos13', code: 'CO5', description: 'Develop an understanding of traditional systems of services provided for settlements, develop sensitivity towards sustainable energy resources, materials, and their application in constructions.' }
+            ],
+            mapping: {
+                'cos9': { 'PO1': '1', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '', 'PO7': '1' },
+                'cos10': { 'PO1': '', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '', 'PO6': '', 'PO7': '2' },
+                'cos11': { 'PO1': '', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '1', 'PO7': '2' },
+                'cos12': { 'PO1': '1', 'PO2': '', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '2', 'PO7': '' },
+                'cos13': { 'PO1': '', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '', 'PO7': '1' }
+            }
+        },
+         {
+            code: '20BAR14', title: 'Architectural and Visual Representation',
+            cos: [
+                { id: 'cos14', code: 'CO1', description: 'Document a work of architecture and place, with its various aspects, using drawings and other modes of documentation (Videography, mapping techniques, etc.)' },
+                { id: 'cos15', code: 'CO2', description: 'Explain the working or the make of an object or system of objects.' },
+                { id: 'cos16', code: 'CO3', description: 'Represent the working or the make of an object or system of objects.' },
+                { id: 'cos17', code: 'CO4', description: 'Develop an individual palette for the representation of a range of man-made and natural materials. Categorize and further compare according to their potential use in various scales and the nature of the presentation.' },
+                { id: 'cos18', code: 'CO5', description: 'Build own format and list of drawings and estimate the scale of an object or structure.' }
+            ],
+            mapping: {
+                'cos14': { 'PO1': '1', 'PO2': '2', 'PO3': '', 'PO4': '', 'PO5': '', 'PO6': '', 'PO7': '' },
+                'cos15': { 'PO1': '', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '', 'PO6': '', 'PO7': '1' },
+                'cos16': { 'PO1': '', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '', 'PO6': '', 'PO7': '2' },
+                'cos17': { 'PO1': '1', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '2', 'PO7': '1' },
+                'cos18': { 'PO1': '1', 'PO2': '2', 'PO3': '', 'PO4': '', 'PO5': '1', 'PO6': '2', 'PO7': '2' }
+            }
+        },
+        // Semester 2
+        {
+             code: '20BAR21', title: 'Introduction to Architectural Design',
+             cos: [
+                 { id: 'cos19', code: 'CO1', description: 'To demonstrate through design the relationship between form, shape, proportion, material, place, scale geometry, circulation, spatial expression, frame of reference, and the user.' },
+                 { id: 'cos20', code: 'CO2', description: 'To be able to assess design problems and develop architectural questions that lead towards a critical outlook in design and emphasize sensitivity towards physical and social context.' },
+                 { id: 'cos21', code: 'CO3', description: 'Demonstrate design ability that integrates Spatial, Structural, Material, Contextual and Visual design through a structured Design process and express through various mediums like drawing, models, etc.' }
+             ],
+             mapping: {
+                 'cos19': { 'PO1': '1', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '1', 'PO7': '1' },
+                 'cos20': { 'PO1': '', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '1', 'PO7': '2' },
+                 'cos21': { 'PO1': '1', 'PO2': '1', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '2', 'PO7': '2' }
+             }
+         },
+         {
+             code: '20BAR22', title: 'Architecture and Change',
+             cos: [
+                 { id: 'cos22', code: 'CO1', description: 'List the major social, cultural, political, economic, technological, and environmental shifts in human history. Further, describe and estimate their impact on architecture and the built environment.' },
+                 { id: 'cos23', code: 'CO2', description: 'Identify the key theories, writings, and paradigm shifts that lead to changes, correlate this with adaptions in the built form of the time, and understand how architecture has been influenced by contemporaneous movements in art and design.' },
+                 { id: 'cos24', code: 'CO3', description: 'Chart the rise and decline of civilizations across space and time, to better understand the factors that lead to specific changes, see how people have dealt with change in the past, and use this knowledge to design for the future.' }
+             ],
+             mapping: {
+                 'cos22': { 'PO1': '1', 'PO2': '2', 'PO3': '', 'PO4': '', 'PO5': '1', 'PO6': '1', 'PO7': '1' },
+                 'cos23': { 'PO1': '1', 'PO2': '1', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '1', 'PO7': '2' },
+                 'cos24': { 'PO1': '', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '1', 'PO7': '2' }
+             }
+         },
+         {
+             code: '20BAR23', title: 'Climate, Site and Superstructure',
+             cos: [
+                 { id: 'cos25', code: 'CO1', description: 'To appraise the use of various tools to interpret climatic data with thermal comfort conditions and be able to apply passive design strategies for a particular site and develop building design.' },
+                 { id: 'cos26', code: 'CO2', description: 'To define and develop knowledge on the materials used in the treatment and finishes of building components, and be able to apply the various contemporary and traditional techniques of these materials in building construction.' },
+                 { id: 'cos27', code: 'CO3', description: 'To comprehend the main components of a building, and the characteristics, specifications, functionality, and practicality of each component in detail for application.' },
+                 { id: 'cos28', code: 'CO4', description: 'To recognize the various methodologies of site explorations, types of soil, properties, and foundations, and be able to define the load path, load-bearing walls, material properties, and application of loads to analyse the behaviour of elements - Bending moments & Shear force' },
+                 { id: 'cos29', code: 'CO5', description: 'To define and recognize the strategies used for the passive design of energy-efficient buildings in different climatic conditions that bring a paradigm change in the architectural design field' }
+             ],
+             mapping: {
+                 'cos25': { 'PO1': '1', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '2', 'PO7': '' },
+                 'cos26': { 'PO1': '1', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '', 'PO7': '2' },
+                 'cos27': { 'PO1': '', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '', 'PO6': '', 'PO7': '1' },
+                 'cos28': { 'PO1': '2', 'PO2': '', 'PO3': '', 'PO4': '', 'PO5': '1', 'PO6': '', 'PO7': '' },
+                 'cos29': { 'PO1': '1', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '2', 'PO7': '2' }
+             }
+         },
+         {
+             code: '20BAR24', title: 'Graphics and Communication',
+             cos: [
+                 { id: 'cos30', code: 'CO1', description: 'Document a work of architecture and place, with its various aspects, using drawings and other modes of documentation (Videography, mapping techniques, etc.)' },
+                 { id: 'cos31', code: 'CO2', description: 'Describe and express various layers of a work of architecture and place. Further, visualize using various mediums of communications.' },
+                 { id: 'cos32', code: 'CO3', description: 'Demonstrate various layers of a work of architecture and place using various mediums of communications' },
+                 { id: 'cos33', code: 'CO4', description: 'Identify, illustrate, construct, and communicate thoughts graphically' }
+             ],
+             mapping: {
+                 'cos30': { 'PO1': '2', 'PO2': '2', 'PO3': '1', 'PO4': '1', 'PO5': '', 'PO6': '', 'PO7': '' },
+                 'cos31': { 'PO1': '2', 'PO2': '', 'PO3': '', 'PO4': '', 'PO5': '1', 'PO6': '', 'PO7': '1' },
+                 'cos32': { 'PO1': '', 'PO2': '', 'PO3': '1', 'PO4': '', 'PO5': '2', 'PO6': '', 'PO7': '2' },
+                 'cos33': { 'PO1': '', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '1', 'PO7': '1' }
+             }
+         },
+         // Semester 3
+         {
+            code: '20BAR31', title: 'S3 Vertical Studio',
+            cos: [
+                { id: 'cos34', code: 'CO1', description: 'The role of institutions in society, and the effect that social and economic factors exert on the built form.' },
+                { id: 'cos35', code: 'CO2', description: 'Building codes and bylaws related to public and semi-public buildings.' },
+                { id: 'cos36', code: 'CO3', description: 'Use appropriate media including the written word and architectural representation techniques to communicate design ideas.' },
+                { id: 'cos37', code: 'CO4', description: 'Design spaces that cater to multiple functions and user groups utilizing an established architecture language, and structural systems that relate to multi-level and multi-use structures.' },
+                { id: 'cos38', code: 'CO5', description: 'Develop building forms that respond to the climate and the context, and communicate a certain meaning to the public.' }
+            ],
+            mapping: {
+                'cos34': { 'PO1': '1', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '1', 'PO7': '1' },
+                'cos35': { 'PO1': '2', 'PO2': '', 'PO3': '1', 'PO4': '1', 'PO5': '1', 'PO6': '', 'PO7': '1' },
+                'cos36': { 'PO1': '', 'PO2': '2', 'PO3': '', 'PO4': '1', 'PO5': '', 'PO6': '', 'PO7': '1' },
+                'cos37': { 'PO1': '1', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '', 'PO7': '1' },
+                'cos38': { 'PO1': '', 'PO2': '', 'PO3': '', 'PO4': '2', 'PO5': '', 'PO6': '', 'PO7': '2' }
+            }
+        },
+        {
+            code: '20BAR32', title: 'History and Construction',
+            cos: [
+                { id: 'cos39', code: 'CO1', description: 'Students will develop a fundamental understanding of materiality, structural systems, and the evolution of building typologies and spatial configurations.' },
+                { id: 'cos40', code: 'CO2', description: 'Introduce the history of architecture and develop an understanding of various typologies that have evolved across the world. Further, deduce the relationship of typologies with the space function and structure. Additionally, the study will help analyse and understand the dependent variables that play a pivotal role in shaping the built form.' },
+                { id: 'cos41', code: 'CO3', description: 'Examine how built forms could be novel Ideas/Creations by Patronages/ Political Regimes/ Individuals' }
+            ],
+            mapping: {
+                'cos39': { 'PO1': '1', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '', 'PO7': '1' },
+                'cos40': { 'PO1': '', 'PO2': '', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '', 'PO7': '1' },
+                'cos41': { 'PO1': '', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '', 'PO7': '2' }
+            }
+        },
+        {
+            code: '20BAR33', title: 'Environment and Building Structures',
+            cos: [
+                 { id: 'cos42', code: 'CO1', description: 'To recognize the importance of environmental conservation by identifying natural systems and designing to conserve or enhance existing natural systems.' },
+                 { id: 'cos43', code: 'CO2', description: 'To develop knowledge on the various types of cement, admixtures, the effective application of cement products in construction, and to identify the applications of different polymeric materials, adhesives, and sealants used in construction.' },
+                 { id: 'cos44', code: 'CO3', description: 'To gain knowledge on the construction of various building elements, and to discuss the critical role of materials and construction techniques used to structurally stabilize buildings, with an emphasis on their detailed specifications.' },
+                 { id: 'cos45', code: 'CO4', description: 'To develop an understanding of the various concepts of structural analysis, to determine the behavior of structural systems, and to define the concepts of designing masonry and RCC structures using IS codes.' },
+                 { id: 'cos46', code: 'CO5', description: 'To recognize the various water supply and waste treatment systems and to evaluate the best method suited for a project.' }
+            ],
+            mapping: {
+                'cos42': { 'PO1': '2', 'PO2': '1', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '', 'PO7': '1' },
+                'cos43': { 'PO1': '1', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '', 'PO7': '1' },
+                'cos44': { 'PO1': '1', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '1', 'PO7': '2' },
+                'cos45': { 'PO1': '', 'PO2': '', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '1', 'PO7': '1' },
+                'cos46': { 'PO1': '1', 'PO2': '', 'PO3': '1', 'PO4': '1', 'PO5': '', 'PO6': '2', 'PO7': '' }
+            }
+        },
+        // Semester 4
+         {
+            code: '20BAR41', title: 'Housing Studio',
+            cos: [
+                 { id: 'cos47', code: 'CO1', description: 'Develop the understanding of community living and further identify the basis of establishing cultural context.' },
+                 { id: 'cos48', code: 'CO2', description: 'Understand various housing types and manners in which they give rise to unique urban issues and recognize socio-cultural factors that shape the identity of the community' },
+                 { id: 'cos49', code: 'CO3', description: 'Build the spaces from the concept and theories of placemaking, vertical stacking, public/ private spaces, open space, and shared amenities. Further demonstrate the understanding of concepts through drawings, write-up, and or models.' },
+                 { id: 'cos50', code: 'CO4', description: 'Use of different representation techniques and tools to communicate design ideas and the process' },
+                 { id: 'cos51', code: 'CO5', description: 'Develop a housing fabric through a structured method and communicate the idea of streetscapes, range of private and public domains, and organic vs. planned configurations' }
+            ],
+            mapping: {
+                 'cos47': { 'PO1': '2', 'PO2': '', 'PO3': '2', 'PO4': '1', 'PO5': '2', 'PO6': '', 'PO7': '' },
+                 'cos48': { 'PO1': '2', 'PO2': '1', 'PO3': '', 'PO4': '', 'PO5': '', 'PO6': '1', 'PO7': '' },
+                 'cos49': { 'PO1': '1', 'PO2': '2', 'PO3': '2', 'PO4': '2', 'PO5': '', 'PO6': '1', 'PO7': '1' },
+                 'cos50': { 'PO1': '1', 'PO2': '1', 'PO3': '', 'PO4': '', 'PO5': '2', 'PO6': '', 'PO7': '2' },
+                 'cos51': { 'PO1': '', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '', 'PO7': '2' }
+            }
+        },
+        {
+            code: '20BAR42', title: 'History and Urbanism 1',
+            cos: [
+                 { id: 'cos52', code: 'CO1', description: 'Describe the concept of urbanism and how it is almost always interwoven with the built form. Further understand and express the major and minor processes leading to the formation, growth, and historical evolution of towns and cities.' },
+                 { id: 'cos53', code: 'CO2', description: 'Build connections between the various layers of a town or city. Further analyse and assess the layers on certain parameters namely - conquest, trade, social factors, economics, politics, so on and so forth application.' },
+                 { id: 'cos54', code: 'CO3', description: 'Identify and critically analyse and charter the course of the history of towns and cities. They will learn to identify factors that qualify as markers on which the evolution of a place hinges. In doing so they will be equipped to apply this learning to understand and study contexts as the primary premise for architecture/built form.' }
+            ],
+            mapping: {
+                 'cos52': { 'PO1': '2', 'PO2': '1', 'PO3': '', 'PO4': '', 'PO5': '', 'PO6': '', 'PO7': '' },
+                 'cos53': { 'PO1': '2', 'PO2': '1', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '2', 'PO7': '' },
+                 'cos54': { 'PO1': '2', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '2', 'PO7': '' }
+            }
+        },
+        {
+            code: '20BAR43', title: 'Building Systems & Electrical Services',
+            cos: [
+                 { id: 'cos55', code: 'CO1', description: 'To identify and describe passive design strategies used to create thermal comfort to enhance designs in the Housing Studio.' },
+                 { id: 'cos56', code: 'CO2', description: 'To comprehend the importance and varied applications of concrete as a composite building material in the construction industry and explore the different types of finishes.' },
+                 { id: 'cos57', code: 'CO3', description: 'To comprehend the constructional aspects of concrete and steel in framed structural systems by describing the making, finishing, and detailing of each structural component involved.' },
+                 { id: 'cos58', code: 'CO4', description: 'To comprehend various structural design methods, and the Importance of the limit state method in designing RCC beams, columns, and slabs under various conditions. To describe methods of pre-stressing and stress loss involved in the design methods of PSC elements.' },
+                 { id: 'cos59', code: 'CO5', description: 'To describe electrical services, fire-fighting, illumination, and vertical transportation systems and integrate them into Architectural Design.' }
+            ],
+            mapping: {
+                 'cos55': { 'PO1': '2', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '2', 'PO7': '2' },
+                 'cos56': { 'PO1': '1', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '', 'PO6': '', 'PO7': '2' },
+                 'cos57': { 'PO1': '', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '', 'PO6': '', 'PO7': '2' },
+                 'cos58': { 'PO1': '2', 'PO2': '1', 'PO3': '', 'PO4': '1', 'PO5': '2', 'PO6': '', 'PO7': '2' },
+                 'cos59': { 'PO1': '1', 'PO2': '', 'PO3': '1', 'PO4': '1', 'PO5': '1', 'PO6': '2', 'PO7': '2' }
+            }
+        },
+        // Semester 5
+         {
+            code: '20BAR51', title: 'S5 Vertical Studio',
+            cos: [
+                 { id: 'cos60', code: 'CO1', description: 'Understand and visualize the role played by institutional architecture and design in shaping the urban realm.' },
+                 { id: 'cos61', code: 'CO2', description: 'Use appropriate media including the written word and architectural representation techniques to communicate design ideas.' },
+                 { id: 'cos62', code: 'CO3', description: 'Understand the National building code, regional building codes, and Indian Standard Codes, and design according to the local building codes and bylaws.' },
+                 { id: 'cos63', code: 'CO4', description: 'Application of systems and services in the design, focusing on sustainable and passive design strategies.' },
+                 { id: 'cos64', code: 'CO5', description: 'Understand the site context using site study, deducting, documenting, and analysis techniques. Further, integrating the design proposal to blend within the fabric of social and physical site context.' },
+                 { id: 'cos65', code: 'CO6', description: 'Evolving an architectural language and designing for new or hybrid building typologies.' }
+            ],
+            mapping: {
+                 'cos60': { 'PO1': '2', 'PO2': '1', 'PO3': '', 'PO4': '', 'PO5': '2', 'PO6': '', 'PO7': '1' }, // Assuming '-' was meant to be '' for simplicity in mapping
+                 'cos61': { 'PO1': '', 'PO2': '2', 'PO3': '', 'PO4': '', 'PO5': '2', 'PO6': '', 'PO7': '2' },
+                 'cos62': { 'PO1': '', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '', 'PO7': '2' },
+                 'cos63': { 'PO1': '', 'PO2': '', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '1', 'PO7': '2' },
+                 'cos64': { 'PO1': '1', 'PO2': '2', 'PO3': '', 'PO4': '', 'PO5': '2', 'PO6': '2', 'PO7': '2' }, // Assuming '-' was meant to be ''
+                 'cos65': { 'PO1': '', 'PO2': '2', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '', 'PO7': '2' } // Assuming '-' was meant to be ''
+            }
+        },
+        {
+            code: '20BAR52', title: 'History and Urbanism 2',
+            cos: [
+                 { id: 'cos66', code: 'CO1', description: 'To trace out through history the changing paradigms of the evolution of global cities by embracing the myriads of influencing aspects from varying dimensions of trade routes, geopolitical opportunity, Europe’s commercial wave, military capability, industrialization, globalization, Influences of the British empire, IT powered wave, new trade arrangements, etc.' },
+                 { id: 'cos67', code: 'CO2', description: 'Dramatize and illustrate the dialogue of cities with the proponents of change by unearthing the layer of phases that cities traverse over time – origin, growth, and decline/ sustenance.' },
+                 { id: 'cos68', code: 'CO3', description: 'To decipher the vocabulary of comprehending the global cities and interpreting the concept to present times' },
+                 { id: 'cos69', code: 'CO4', description: 'To apply the knowledge of what forms and informs cities and shape them into evolving entities with critically selecting such an example and developing a methodology of the study of all parameters previously dealt in detail.' }
+            ],
+            mapping: {
+                 'cos66': { 'PO1': '2', 'PO2': '', 'PO3': '', 'PO4': '', 'PO5': '2', 'PO6': '1', 'PO7': '' },
+                 'cos67': { 'PO1': '1', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '1', 'PO7': '1' },
+                 'cos68': { 'PO1': '2', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '', 'PO7': '' },
+                 'cos69': { 'PO1': '1', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '1', 'PO7': '' }
+            }
+        },
+        {
+            code: '20BAR53', title: 'Building Detailing and Valuation',
+            cos: [
+                 { id: 'cos70', code: 'CO1', description: 'To summarize various environmental laws and energy codes relevant to the Indian building industry and recognize its implications on building sites and environment' },
+                 { id: 'cos71', code: 'CO2', description: 'To interpret and communicate information through detailed drawings to the site, incorporating the details of the construction process. To illustrate standard practices, approvals, permits, regulatory processes, and specifications to produce construction documents.' },
+                 { id: 'cos72', code: 'CO3', description: 'To illustrate connections between structural steel members, and the design concepts of tensile and compressive members, and special structural forms.' },
+                 { id: 'cos73', code: 'CO4', description: 'To demonstrate the various processes of estimation, costing, valuation and tendering.' }
+            ],
+            mapping: {
+                 'cos70': { 'PO1': '1', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '', 'PO6': '', 'PO7': '2' }, // Assuming '-' was meant to be ''
+                 'cos71': { 'PO1': '1', 'PO2': '2', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '1', 'PO7': '2' },
+                 'cos72': { 'PO1': '', 'PO2': '1', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '1', 'PO7': '1' },
+                 'cos73': { 'PO1': '1', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '', 'PO6': '2', 'PO7': '' }
+            }
+        },
+        {
+             code: '20BAR54', title: 'Co-operative Learning Preparation',
+             cos: [
+                  { id: 'cos74', code: 'CO1', description: 'Build and develop office etiquettes, soft skills necessary while in a professional setting.' },
+                  { id: 'cos75', code: 'CO2', description: 'Compare different options and choose the field of interest as per their aptitude and skill.' },
+                  { id: 'cos76', code: 'CO3', description: 'Implement the learning in the design process and generate workable solutions.' },
+                  { id: 'cos77', code: 'CO4', description: 'Develop and collect works done during the internship and present them succinctly using appropriate presentation techniques.' }
+             ],
+             mapping: {
+                 'cos74': { 'PO1': '1', 'PO2': '2', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '', 'PO7': '' },
+                 'cos75': { 'PO1': '2', 'PO2': '1', 'PO3': '1', 'PO4': '1', 'PO5': '1', 'PO6': '2', 'PO7': '1' },
+                 'cos76': { 'PO1': '2', 'PO2': '1', 'PO3': '', 'PO4': '', 'PO5': '2', 'PO6': '2', 'PO7': '2' },
+                 'cos77': { 'PO1': '1', 'PO2': '1', 'PO3': '', 'PO4': '', 'PO5': '', 'PO6': '', 'PO7': '2' }
+             }
+        },
+        // Semester 6
+         {
+            code: '20BAR65', title: 'Co-operative Learning',
+            cos: [
+                 { id: 'cos78', code: 'CO1', description: 'Summarize and formulate the knowledge and skillsets gained during the training.' },
+                 { id: 'cos79', code: 'CO2', description: 'Discover individual self-skills concerning specific domain and further identify and develop the expertise needed to carry out the tasks in the office.' },
+                 { id: 'cos80', code: 'CO3', description: 'Compile the undertakings in an area of specialization and further synthesize ideas about the synergy between academic teachings and practical learnings.' },
+                 { id: 'cos81', code: 'CO4', description: 'Analyse and interpret learning in terms of the design process and generate workable design solutions in architecture.' }
+            ],
+            mapping: {
+                 'cos78': { 'PO1': '1', 'PO2': '1', 'PO3': '1', 'PO4': '1', 'PO5': '', 'PO6': '1', 'PO7': '2' },
+                 'cos79': { 'PO1': '1', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '', 'PO7': '1' },
+                 'cos80': { 'PO1': '1', 'PO2': '', 'PO3': '', 'PO4': '', 'PO5': '', 'PO6': '', 'PO7': '2' },
+                 'cos81': { 'PO1': '1', 'PO2': '', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '1', 'PO7': '2' }
+            }
+        },
+        // Semester 7
+        {
+            code: '20BAR71', title: 'Urban Studio / Exchange Studio',
+            cos: [
+                 { id: 'cos82', code: 'CO1', description: 'Would be able to recognize, relate and analyse the morphology of different urban contexts.' },
+                 { id: 'cos83', code: 'CO2', description: 'Identify, collect and deduce social fabric parameters from various layers of the city. Further, synthesize ideas about how an architectural design can work in harmony with different systems in place.' },
+                 { id: 'cos84', code: 'CO3', description: 'Visualize and explain the site concerning various social, economical, and intra-personal dimensions. Build the ideas using various mapping methods. Further, propose design interventions.' },
+                 { id: 'cos85', code: 'CO4', description: 'Analyse the values implicit in each of their proposals, stressing the connections between ideas and design.' },
+                 { id: 'cos86', code: 'CO5', description: 'Develop and discover the skills and ability to generate appropriate urban scale drawings and maps. Further, discuss and present the analysed data succinctly. Additionally elaborate on how the proposed design strategies work at the macro, and micro scales.' }
+            ],
+            mapping: {
+                 'cos82': { 'PO1': '2', 'PO2': '1', 'PO3': '', 'PO4': '', 'PO5': '2', 'PO6': '', 'PO7': '' },
+                 'cos83': { 'PO1': '1', 'PO2': '', 'PO3': '', 'PO4': '', 'PO5': '2', 'PO6': '', 'PO7': '2' },
+                 'cos84': { 'PO1': '1', 'PO2': '1', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '', 'PO7': '2' }, // Assuming '-' was meant to be ''
+                 'cos85': { 'PO1': '1', 'PO2': '1', 'PO3': '', 'PO4': '1', 'PO5': '2', 'PO6': '2', 'PO7': '2' },
+                 'cos86': { 'PO1': '1', 'PO2': '1', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '2', 'PO7': '2' }
+            }
+        },
+        {
+            code: '20BAR73', title: 'Building Systems and Practices',
+            cos: [
+                 { id: 'cos87', code: 'CO1', description: 'To identify the basic tenets of green buildings and their benefits, and develop knowledge on green building rating systems.' },
+                 { id: 'cos88', code: 'CO2', description: 'To comprehend the usage of ferrous and nonferrous materials in building construction; with a primary focus on steel, and to develop knowledge on its significant usage in large-span structures.' },
+                 { id: 'cos89', code: 'CO3', description: 'To illustrate material qualities, finishes, and methods of construction using steel, and to comprehend and analyse the use of steel in complex structural systems, its application in catering to large-span structures, and its integration with design studio' },
+                 { id: 'cos90', code: 'CO4', description: 'Discuss the active and passive components of Heating Ventilation and Air Conditioning (HVAC), their underlying principles, and apply the knowledge in their design studio.' }
+            ],
+            mapping: {
+                 'cos87': { 'PO1': '1', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '', 'PO6': '2', 'PO7': '1' },
+                 'cos88': { 'PO1': '1', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '', 'PO7': '1' },
+                 'cos89': { 'PO1': '1', 'PO2': '', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '1', 'PO7': '2' },
+                 'cos90': { 'PO1': '1', 'PO2': '1', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '', 'PO7': '' }
+            }
+        },
+        // Semester 8 Vertical Studio options
+        {
+             code: '20BAR811', title: 'Vertical Studio 2: Advanced Design',
+             cos: [
+                  { id: 'cos91', code: 'CO1', description: 'Able to actively engage with emerging issues that concern habitat and deliberate design solutions for the same.' },
+                  { id: 'cos92', code: 'CO2', description: 'Able to analyse real life situations and problems. Further, adopt advanced design & fabrication techniques to benefit user and society.' },
+                  { id: 'cos93', code: 'CO3', description: 'To inquire into the varied nature and practice of computation in architectural design, and how design meaning, intentions, and knowledge are constructed through parametric thinking, representing, sensing, and making.' },
+                  { id: 'cos94', code: 'CO4', description: 'To be able to demonstrate Detailed Architectural interventions using the digital parametric tool.' }
+             ],
+             mapping: {
+                  'cos91': { 'PO1': '1', 'PO2': '1', 'PO3': '', 'PO4': '', 'PO5': '2', 'PO6': '2', 'PO7': '2' },
+                  'cos92': { 'PO1': '', 'PO2': '', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '', 'PO7': '2' },
+                  'cos93': { 'PO1': '', 'PO2': '', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '', 'PO7': '2' }, // Assuming '-' was meant to be ''
+                  'cos94': { 'PO1': '', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '', 'PO6': '1', 'PO7': '' } // Assuming '-' was meant to be ''
+             }
+         },
+         {
+              code: '20BAR812', title: 'Vertical Studio 2: Conservation',
+              cos: [
+                   { id: 'cos95', code: 'CO1', description: 'To identify and categorize Heritage buildings.' },
+                   { id: 'cos96', code: 'CO2', description: 'Develop a wider understanding of the notion & nature of ‘heritage’ and its values.' },
+                   { id: 'cos97', code: 'CO3', description: 'Help to develop skills in observation, recording, documenting, analysis, understanding, and evaluation of historic buildings and places so that students become more knowledgeable and sensitive to the built environment.' }
+              ],
+              mapping: {
+                  'cos95': { 'PO1': '1', 'PO2': '1', 'PO3': '1', 'PO4': '2', 'PO5': '2', 'PO6': '', 'PO7': '1' },
+                  'cos96': { 'PO1': '', 'PO2': '', 'PO3': '1', 'PO4': '1', 'PO5': '', 'PO6': '2', 'PO7': '1' }, // Assuming '-' was meant to be ''
+                  'cos97': { 'PO1': '2', 'PO2': '2', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '', 'PO7': '1' } // Assuming '-' was meant to be ''
+              }
+         },
+         {
+              code: '20BAR813', title: 'Vertical Studio 2: Landscape',
+              cos: [
+                   { id: 'cos98', code: 'CO1', description: 'Understand different landscape sites and the parameters influencing them.' },
+                   { id: 'cos99', code: 'CO2', description: 'Identify different landscape sites and express them succinctly through drawing techniques. Further, identify the parameters which influence them.' },
+                   { id: 'cos100', code: 'CO3', description: 'Developing site-sensitive sustainable design solutions to address the multitudes of influencing parameters at both micro and macro scale.' }
+              ],
+              mapping: {
+                   'cos98': { 'PO1': '2', 'PO2': '', 'PO3': '1', 'PO4': '', 'PO5': '1', 'PO6': '', 'PO7': '' },
+                   'cos99': { 'PO1': '2', 'PO2': '1', 'PO3': '2', 'PO4': '1', 'PO5': '1', 'PO6': '', 'PO7': '1' }, // Assuming '-' was meant to be ''
+                   'cos100': { 'PO1': '1', 'PO2': '1', 'PO3': '2', 'PO4': '1', 'PO5': '1', 'PO6': '', 'PO7': '2' } // Assuming '-' was meant to be ''
+              }
+         },
+         {
+             code: '20BAR814', title: 'Vertical Studio 2: Sustainability',
+             cos: [
+                  { id: 'cos101', code: 'CO1', description: 'Apply the fundamentals of passive design/climatology right at the conceptual design stage to formulate the building envelope (like generate building form, defining Aspect Ratio, defining Orientation, and defining Window to Wall Ratio) and choosing sustainable materials.' },
+                  { id: 'cos102', code: 'CO2', description: 'Choose building envelope materials as per the context of the location. Furthermore, detail the design interventions (building wall section, roof sections, etc) using passive design principles to have buildings thermally comfortable.' },
+                  { id: 'cos103', code: 'CO3', description: 'Analyse the design for its energy and lighting-daylighting performance. Identify the annual energy consumption of the building. Furthermore, suggest changes in building design to reduce the energy consumption' }
+             ],
+             mapping: {
+                 'cos101': { 'PO1': '', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '1', 'PO7': '2' },
+                 'cos102': { 'PO1': '2', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '2', 'PO7': '2' },
+                 'cos103': { 'PO1': '', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '2', 'PO7': '2' }
+             }
+         },
+         {
+             code: '20BAR815', title: 'Vertical Studio 2: Urban Housing',
+             cos: [
+                  { id: 'cos104', code: 'CO1', description: 'Understand and discuss issues relevant to housing design in India' },
+                  { id: 'cos105', code: 'CO2', description: 'To develop strategies and interventions concerning different scopes of sites chosen within the areas of development, including the core, the peri-urban, and the suburban.' },
+                  { id: 'cos106', code: 'CO3', description: 'Explore different urban housing parameters for further explorations and Design using an iterative design method' },
+                  { id: 'cos107', code: 'CO4', description: 'Correlate multiple contextual factors with specific design decisions.' },
+                  { id: 'cos108', code: 'CO5', description: 'Analyse the values implicit in each of their proposals, stressing the connections between ideas and design, with the larger scales of the respective plans of the city, right from macro-level vision plans to miso level developmental plans.' },
+                  { id: 'cos109', code: 'CO6', description: 'Planning housing strategies based on concerns raised on site, after analysis and produce various housing design guidelines based on the contextual parameters of the larger context.' }
+             ],
+             mapping: {
+                 'cos104': { 'PO1': '1', 'PO2': '1', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '1', 'PO7': '2' },
+                 'cos105': { 'PO1': '2', 'PO2': '2', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '1', 'PO7': '1' },
+                 'cos106': { 'PO1': '1', 'PO2': '1', 'PO3': '', 'PO4': '', 'PO5': '2', 'PO6': '2', 'PO7': '2' },
+                 'cos107': { 'PO1': '1', 'PO2': '1', 'PO3': '', 'PO4': '', 'PO5': '2', 'PO6': '', 'PO7': '2' },
+                 'cos108': { 'PO1': '', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '1', 'PO7': '2' },
+                 'cos109': { 'PO1': '1', 'PO2': '1', 'PO3': '1', 'PO4': '2', 'PO5': '1', 'PO6': '2', 'PO7': '2' }
+             }
+        },
+        {
+            code: '20BAR83', title: 'Management and Interior Systems',
+            cos: [
+                 { id: 'cos110', code: 'CO1', description: 'To demonstrate a basic understanding of Construction Management, conduct project planning activities that accurately forecast project costs, timelines, and quality, and implement processes for successful resource, communication, and risk and change management.' },
+                 { id: 'cos111', code: 'CO2', description: 'To comprehend materiality concerning the indoor environments and be able to distinguish and adopt sustainable and suitable materials for the interiors of varied building typologies.' },
+                 { id: 'cos112', code: 'CO3', description: 'To describe the fundamental designing and detailing of interior spaces, to analyze and use construction materials, and to prepare schematic, detail, construction drawings, working details, and cost.' },
+                 { id: 'cos113', code: 'CO4', description: 'To comprehend the concepts used in architectural acoustics and to be able to identify, discuss and resolve acoustical problems related to architectural acoustics, and acoustic comfort.' }
+            ],
+            mapping: {
+                 'cos110': { 'PO1': '1', 'PO2': '2', 'PO3': '2', 'PO4': '2', 'PO5': '', 'PO6': '2', 'PO7': '2' },
+                 'cos111': { 'PO1': '2', 'PO2': '', 'PO3': '2', 'PO4': '1', 'PO5': '1', 'PO6': '', 'PO7': '2' },
+                 'cos112': { 'PO1': '2', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '', 'PO7': '2' }, // Assuming '-' was meant to be ''
+                 'cos113': { 'PO1': '2', 'PO2': '2', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '2', 'PO7': '2' }
+            }
+        },
+        {
+            code: '20BAR85', title: 'Dissertation',
+            cos: [
+                 { id: 'cos114', code: 'CO1', description: 'Identify and express the anatomy of the basic research methodologies with necessary literature studies. Further, identify the literature sources as well as structure a technical report through appropriate research typology.' },
+                 { id: 'cos115', code: 'CO2', description: 'The student will have the comprehensive knowledge to collect, assimilate, and synthesize the data related to the specific research.' },
+                 { id: 'cos116', code: 'CO3', description: 'The student will be capable of presenting the research in a formal and structured way of reports and presentations through technical representation skills.' },
+                 { id: 'cos117', code: 'CO4', description: 'The student will have the fundamental ability to critically think and enumerate the practical applications of various research conducted.' }
+            ],
+            mapping: {
+                 'cos114': { 'PO1': '2', 'PO2': '1', 'PO3': '2', 'PO4': '1', 'PO5': '2', 'PO6': '', 'PO7': '' },
+                 'cos115': { 'PO1': '2', 'PO2': '2', 'PO3': '', 'PO4': '', 'PO5': '2', 'PO6': '', 'PO7': '2' }, // Assuming '-' was meant to be ''
+                 'cos116': { 'PO1': '', 'PO2': '2', 'PO3': '', 'PO4': '', 'PO5': '2', 'PO6': '', 'PO7': '2' }, // Assuming '-' was meant to be ''
+                 'cos117': { 'PO1': '', 'PO2': '1', 'PO3': '', 'PO4': '', 'PO5': '1', 'PO6': '2', 'PO7': '1' }
+            }
+        },
+        // Semester 9
+        {
+            code: '20BAR95', title: 'Internship',
+            cos: [
+                 { id: 'cos118', code: 'CO1', description: 'Identify and understand the role of architects in the practice and build skills for taking actions on-site decision-making process' },
+                 { id: 'cos119', code: 'CO2', description: 'Assess the self\'s ability to execute the knowledge and learning gained during the academic period to deliver a successful project.' },
+                 { id: 'cos120', code: 'CO3', description: 'Build a proactive attitude for problem-solving and decision-making. Further, ensure maximum development of required professional skills to formulate a proposal for execution of the project.' },
+                 { id: 'cos121', code: 'CO4', description: 'Analyse and interpret learning of the design process and generate workable design solutions in architecture and construction technology.' }
+            ],
+            mapping: {
+                 'cos118': { 'PO1': '1', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '2', 'PO7': '2' },
+                 'cos119': { 'PO1': '2', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '', 'PO7': '2' }, // Assuming '-' was meant to be ''
+                 'cos120': { 'PO1': '2', 'PO2': '2', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '', 'PO7': '2' }, // Assuming '-' was meant to be ''
+                 'cos121': { 'PO1': '2', 'PO2': '2', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '2', 'PO7': '2' }
+            }
+        },
+        // Semester 10 Capstone Project Options (using COs/mapping from their tables)
+         {
+             code: '20BAR1011', title: 'Capstone Project: Advanced Design',
+             cos: [
+                  { id: 'cos122', code: 'CO1', description: 'Build and formulate design ideas and proposals using appropriate media and representation techniques. Further, communicate ideas succinctly at each stage of the design process; additionally, culminate all the ideas into generating a complete design.' },
+                  { id: 'cos123', code: 'CO2', description: 'Articulate, propose, and defend ideas and positions on architecture.' },
+                  { id: 'cos124', code: 'CO3', description: 'Demonstrate the ability to perform original, independent, research or design in a chosen field of interest.' }
+             ],
+             mapping: {
+                 'cos122': { 'PO1': '2', 'PO2': '2', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '1', 'PO7': '2' },
+                 'cos123': { 'PO1': '1', 'PO2': '1', 'PO3': '1', 'PO4': '2', 'PO5': '2', 'PO6': '2', 'PO7': '2' },
+                 'cos124': { 'PO1': '', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '1', 'PO7': '2' }
+             }
+         },
+        {
+             code: '20BAR1012', title: 'Capstone Project: Conservation',
+             cos: [
+                   { id: 'cos125', code: 'CO1', description: 'To identify and categorize Heritage buildings.' },
+                   { id: 'cos126', code: 'CO2', description: 'Develop a wider understanding of the notion & nature of ‘heritage’ and its values.' },
+                   { id: 'cos127', code: 'CO3', description: 'Solve the gaps through layering of history with help of analysis to discover lost traditional knowledge systems in the relevant context.' },
+                   { id: 'cos128', code: 'CO4', description: 'Help to develop skills in observation, recording, documenting, analysis, understanding, and evaluation of historic buildings and places so that students become more knowledgeable and sensitive to the built environment.' },
+                   { id: 'cos129', code: 'CO5', description: 'Discover the traditional knowledge systems existing in the historic cities to establish values of tangible and intangible heritage.' }
+             ],
+             mapping: {
+                 'cos125': { 'PO1': '1', 'PO2': '1', 'PO3': '1', 'PO4': '2', 'PO5': '2', 'PO6': '', 'PO7': '1' },
+                 'cos126': { 'PO1': '', 'PO2': '', 'PO3': '1', 'PO4': '1', 'PO5': '', 'PO6': '2', 'PO7': '1' }, // Assuming '-' was meant to be ''
+                 'cos127': { 'PO1': '1', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '', 'PO7': '2' }, // Assuming '-' was meant to be ''
+                 'cos128': { 'PO1': '2', 'PO2': '2', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '', 'PO7': '1' }, // Assuming '-' was meant to be ''
+                 'cos129': { 'PO1': '', 'PO2': '1', 'PO3': '', 'PO4': '1', 'PO5': '1', 'PO6': '2', 'PO7': '' } // Assuming '-' was meant to be ''
+             }
+        },
+         {
+             code: '20BAR1013', title: 'Capstone Project: Landscape',
+             cos: [
+                   { id: 'cos130', code: 'CO1', description: 'Understanding the landscape site in relation to the larger context' },
+                   { id: 'cos131', code: 'CO2', description: 'In-depth documentation and critically addressing the different layers of landscape to understand its changing dynamics.' },
+                   { id: 'cos132', code: 'CO3', description: 'Developing a strong research-based rationale to intervene and design considering the landscape in micro and macro scale.' }
+             ],
+             mapping: {
+                 'cos130': { 'PO1': '2', 'PO2': '', 'PO3': '1', 'PO4': '', 'PO5': '1', 'PO6': '', 'PO7': '' },
+                 'cos131': { 'PO1': '1', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '', 'PO6': '1', 'PO7': '' }, // Assuming '-' was meant to be ''
+                 'cos132': { 'PO1': '1', 'PO2': '2', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '2', 'PO7': '2' }
+             }
+        },
+        {
+             code: '20BAR1014', title: 'Capstone Project: Sustainability',
+             cos: [
+                   { id: 'cos133', code: 'CO1', description: 'Apply the fundamentals of passive design/climatology right at the conceptual design stage to formulate the building envelope (like generate building form, defining Aspect Ratio, defining Orientation, and defining Window to Wall Ratio) and choosing sustainable materials.' },
+                   { id: 'cos134', code: 'CO2', description: 'Create building designs so as to achieve optimization of site potential; optimization of energy use; optimize building spaces and material use.' },
+                   { id: 'cos135', code: 'CO3', description: 'Analyse the building design within a total project context in order to achieve quality, high-energy performance up to nearly zero energy buildings (nZEBs). Quantify the performance of the building for its energy and daylight along with integrating the renewable energy.' }
+             ],
+             mapping: {
+                 'cos133': { 'PO1': '', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '1', 'PO7': '2' },
+                 'cos134': { 'PO1': '2', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '1', 'PO7': '2' },
+                 'cos135': { 'PO1': '', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '2', 'PO6': '2', 'PO7': '2' }
+             }
+        },
+        {
+             code: '20BAR1015', title: 'Capstone Project: Urban Housing',
+             cos: [
+                  { id: 'cos136', code: 'CO1', description: 'Deduce influences and demands for housing in India and ability to propose suitable design resolutions in the area of strategic housing development, and Interpret complexities of proving shelter for people from different socioeconomic backgrounds close to each other, in a tightly kneed urban setting.' },
+                  { id: 'cos137', code: 'CO2', description: 'Understand and discuss major planning, policy, and design concerns relevant to housing design in India' },
+                  { id: 'cos138', code: 'CO3', description: 'Design strategies, and interventions using iterative design methods, and further communicate through the fundamental hopes of urban housing.' },
+                  { id: 'cos139', code: 'CO4', description: 'Correlate multiple contextual factors with specific design decisions and multiple dimensions.' },
+                  { id: 'cos140', code: 'CO5', description: 'Analyse the values implicit in each of their proposals, stressing the connections between ideas and design, with the larger scales of the respective plans of the city, right from macro-level vision plans to miso level developmental plans.' },
+                  { id: 'cos141', code: 'CO6', description: 'Planning housing strategies based on concerns raised on site, after analysis and produce various housing design guidelines based on the contextual parameters of the larger context.' }
+             ],
+             mapping: {
+                 'cos136': { 'PO1': '1', 'PO2': '1', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '1', 'PO7': '2' },
+                 'cos137': { 'PO1': '2', 'PO2': '2', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '1', 'PO7': '1' },
+                 'cos138': { 'PO1': '1', 'PO2': '1', 'PO3': '', 'PO4': '', 'PO5': '2', 'PO6': '2', 'PO7': '2' },
+                 'cos139': { 'PO1': '1', 'PO2': '1', 'PO3': '', 'PO4': '', 'PO5': '2', 'PO6': '', 'PO7': '2' },
+                 'cos140': { 'PO1': '', 'PO2': '1', 'PO3': '2', 'PO4': '2', 'PO5': '1', 'PO6': '1', 'PO7': '2' },
+                 'cos141': { 'PO1': '1', 'PO2': '1', 'PO3': '1', 'PO4': '2', 'PO5': '1', 'PO6': '2', 'PO7': '2' }
+             }
+        },
+        {
+             code: '20BAR105', title: 'Professional Practice',
+             cos: [
+                   { id: 'cos142', code: 'CO1', description: 'Identify and discover the role of professional and statutory bodies, the code of conduct, and most importantly the role of an architect in project execution.' },
+                   { id: 'cos143', code: 'CO2', description: 'Identify the structured methods of project execution and the right of way of exercising the rights as a professional.' },
+                   { id: 'cos144', code: 'CO3', description: 'Build professional capacity to make well-informed decisions on site. Further, identify if the decisions are in tandem with the national and or local guidelines and norms.' }
+             ],
+             mapping: {
+                  'cos142': { 'PO1': '2', 'PO2': '2', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '', 'PO7': '1' },
+                  'cos143': { 'PO1': '2', 'PO2': '2', 'PO3': '1', 'PO4': '1', 'PO5': '2', 'PO6': '', 'PO7': '2' },
+                  'cos144': { 'PO1': '2', 'PO2': '2', 'PO3': '2', 'PO4': '2', 'PO5': '', 'PO6': '', 'PO7': '2' }
+             }
+        },
+    ];
+
+    let poDescriptions; // Will hold the current PO data
+    let coursesData;    // Will hold the current courses data
+    let notesContent;   // Will hold the current notes content
+    let nextCoId = 200; // Starting ID for new COs, higher than any default IDs
+
+    // --- DOM Elements ---
+    const courseSelect = document.getElementById('course-select');
+    const deleteCourseBtn = document.getElementById('delete-course-btn');
+    const addCourseBtn = document.getElementById('add-course-btn');
+    const addCourseForm = document.getElementById('add-course-form');
+    const newCourseCodeInput = document.getElementById('new-course-code');
+    const newCourseTitleInput = document.getElementById('new-course-title');
+    const saveNewCourseBtn = document.getElementById('save-new-course-btn');
+    const cancelAddCourseBtn = document.getElementById('cancel-add-course-btn');
+    const selectedCourseTitleSpan = document.getElementById('selected-course-title');
+    const mappingTableBody = document.getElementById('mapping-table').querySelector('tbody');
+    const addCoBtn = document.getElementById('add-co-btn');
+    const poListElement = document.getElementById('po-list');
+    const editPoDescBtn = document.getElementById('edit-po-desc-btn');
+    const notesTextarea = document.getElementById('notes-textarea');
+    const saveDataBtn = document.getElementById('save-data-btn');
+    const loadDataBtn = document.getElementById('load-data-btn');
+    const clearDataBtn = document.getElementById('clear-data-btn');
+    const saveStatusP = document.getElementById('save-status');
+
+    // --- Local Storage Keys ---
+    const STORAGE_KEY_COURSES = 'nitteBarchCoursesData';
+    const STORAGE_KEY_PO = 'nitteBarchPoDescriptions';
+    const STORAGE_KEY_NOTES = 'nitteBarchNotes';
+    const STORAGE_KEY_NEXT_CO_ID = 'nitteBarchNextCoId';
+    const STORAGE_KEY_LAST_SELECTED_COURSE = 'nitteBarchLastSelectedCourse';
+
+
+    // --- Utility Functions ---
+
+    // Generates a unique ID for a new CO
+    function generateCoId() {
+        return 'cos' + (nextCoId++);
+    }
+
+    // Finds a course by its code
+    function findCourse(code) {
+        return coursesData.find(c => c.code === code);
+    }
+
+    // Finds a course by its code and returns its index
+    function findCourseIndex(code) {
+        return coursesData.findIndex(c => c.code === code);
+    }
+
+    // Displays a temporary status message
+    function showStatus(message, isError = false) {
+        saveStatusP.textContent = message;
+        saveStatusP.style.color = isError ? 'red' : 'green'; // Use direct colors for status
+        setTimeout(() => {
+            saveStatusP.textContent = '';
+             saveStatusP.style.color = ''; // Reset color
+        }, 3000); // Clear after 3 seconds
+    }
+
+    // --- Save/Load/Clear Data ---
+
+    function saveData() {
+        try {
+            localStorage.setItem(STORAGE_KEY_COURSES, JSON.stringify(coursesData));
+            localStorage.setItem(STORAGE_KEY_PO, JSON.stringify(poDescriptions));
+            localStorage.setItem(STORAGE_KEY_NOTES, notesTextarea.value);
+            localStorage.setItem(STORAGE_KEY_NEXT_CO_ID, nextCoId);
+             // Save the currently selected course
+             if (courseSelect.value) {
+                 localStorage.setItem(STORAGE_KEY_LAST_SELECTED_COURSE, courseSelect.value);
+             } else {
+                 localStorage.removeItem(STORAGE_KEY_LAST_SELECTED_COURSE);
+             }
+
+
+            showStatus('Data saved successfully!');
+        } catch (e) {
+            showStatus('Error saving data! Check browser storage limits.', true);
+            console.error('Error saving data:', e);
+        }
+    }
+
+    function loadData() {
+        // Always start with default data
+        poDescriptions = JSON.parse(JSON.stringify(poDescriptionsDefault)); // Deep copy to avoid modifying default
+        coursesData = JSON.parse(JSON.stringify(coursesDataDefault));       // Deep copy
+        notesContent = ""; // Default notes empty
+        nextCoId = 200; // Default starting ID
+
+        try {
+            const savedCourses = localStorage.getItem(STORAGE_KEY_COURSES);
+            const savedPO = localStorage.getItem(STORAGE_KEY_PO);
+            const savedNotes = localStorage.getItem(STORAGE_KEY_NOTES);
+            const savedNextCoId = localStorage.getItem(STORAGE_KEY_NEXT_CO_ID);
+            const lastSelectedCode = localStorage.getItem(STORAGE_KEY_LAST_SELECTED_COURSE);
+
+            if (savedCourses) {
+                coursesData = JSON.parse(savedCourses);
+            }
+            if (savedPO) {
+                poDescriptions = JSON.parse(savedPO);
+            }
+            if (savedNotes !== null) { // Check for null, not just truthiness, to allow empty notes
+                notesTextarea.value = savedNotes;
+            } else {
+                 notesTextarea.value = ""; // Explicitly set empty if no saved notes
+            }
+            if (savedNextCoId) {
+                nextCoId = parseInt(savedNextCoId, 10);
+            }
+
+            populateCourseSelect();
+            displayPoDescriptions(); // This sets the editing state for POs and table
+
+            // Re-select the previously selected course if available and still exists
+            if (lastSelectedCode && findCourse(lastSelectedCode)) {
+                 courseSelect.value = lastSelectedCode;
+                 displayMapping(lastSelectedCode);
+            } else {
+                 displayMapping(''); // Show initial message if no course or invalid course
+            }
+
+             // showStatus('Data loaded.'); // Removed, displayMapping/populate handles initial state
+        } catch (e) {
+            showStatus('Error loading data! Using default data.', true);
+            console.error('Error loading data:', e);
+            // If loading fails, the variables already hold the default data, so populate/display will use them.
+            populateCourseSelect();
+            displayPoDescriptions();
+            displayMapping('');
+        }
+         // Ensure UI reflects non-editing state initially
+         isEditingPo = false; // Explicitly set to false on load
+         displayPoDescriptions(); // Update UI state based on isEditingPo = false
+         displayMapping(courseSelect.value); // Update table state based on isEditingPo = false
+    }
+
+    function clearData() {
+        if (confirm('Are you sure you want to clear all saved data? This cannot be undone!')) {
+            localStorage.removeItem(STORAGE_KEY_COURSES);
+            localStorage.removeItem(STORAGE_KEY_PO);
+            localStorage.removeItem(STORAGE_KEY_NOTES);
+            localStorage.removeItem(STORAGE_KEY_NEXT_CO_ID);
+            localStorage.removeItem(STORAGE_KEY_LAST_SELECTED_COURSE);
+
+            // Reset variables to their initial state (by calling loadData which starts with defaults)
+            loadData(); // This will reset data, populate dropdown, and clear mapping area
+
+            showStatus('All data cleared.');
+        }
+    }
+
+
+    // --- Populate Dropdown ---
+    function populateCourseSelect() {
+        // Clear existing options except the default
+        courseSelect.innerHTML = '<option value="">--Select Course--</option>';
+        // Sort courses alphabetically by code before populating
+        coursesData.sort((a, b) => a.code.localeCompare(b.code));
+
+        coursesData.forEach(course => {
+            const option = document.createElement('option');
+            option.value = course.code;
+            option.textContent = `${course.code} - ${course.title}`;
+            courseSelect.appendChild(option);
+        });
+        // Enable/disable delete button based on selection and PO editing state
+        deleteCourseBtn.disabled = !courseSelect.value || isEditingPo;
+    }
+
+    // --- Display PO Descriptions (Editable) ---
+    let isEditingPo = false; // State variable
+
+    function displayPoDescriptions() {
+        poListElement.innerHTML = '';
+        for (const poCode in poDescriptions) {
+            const listItem = document.createElement('li');
+            // Use a span inside the li for the editable description text
+            listItem.innerHTML = `<strong>${poCode}</strong>: <span class="editable-po-desc" id="po-desc-${poCode}" data-po="${poCode}">${poDescriptions[poCode]}</span>`;
+            const editableSpan = listItem.querySelector('.editable-po-desc');
+
+            // Set contenteditable based on the state variable
+            editableSpan.setAttribute('contenteditable', isEditingPo);
+
+            // Add/Remove blur listener based on the state variable
+            if (isEditingPo) {
+                 editableSpan.addEventListener('blur', handlePoDescriptionEdit);
+                 editableSpan.style.borderBottom = '1px dashed var(--bondi-blue)'; // Indicate editability
+                 editableSpan.style.cursor = 'text';
+            } else {
+                 editableSpan.removeEventListener('blur', handlePoDescriptionEdit); // Remove listener
+                 editableSpan.style.borderBottom = 'none'; // Remove dashed border
+                 editableSpan.style.cursor = 'default';
+            }
+
+            poListElement.appendChild(listItem);
+        }
+
+        // Update the button text and disable other buttons when editing POs
+        editPoDescBtn.textContent = isEditingPo ? 'Save POs' : 'Edit POs';
+        addCourseBtn.disabled = isEditingPo;
+        // deleteCourseBtn.disabled is handled by populateCourseSelect and displayMapping
+        saveDataBtn.disabled = isEditingPo;
+        loadDataBtn.disabled = isEditingPo;
+        clearDataBtn.disabled = isEditingPo;
+        addCoBtn.style.display = isEditingPo ? 'none' : ''; // Hide Add CO button when editing POs
+
+        // Toggle editability of table cells and delete buttons
+        toggleTableEditability(!isEditingPo); // Pass the desired state for table editing
+    }
+
+    function handlePoDescriptionEdit(event) {
+        const poCode = event.target.dataset.po;
+        // Update the description in the data structure
+        poDescriptions[poCode] = event.target.textContent.trim();
+         // No need to save immediately, user will click Save All Data
+    }
+
+    function togglePoEdit() {
+        isEditingPo = !isEditingPo;
+        displayPoDescriptions(); // This function now handles updating the UI based on isEditingPo
+    }
+
+
+    // --- Display CO-PO Mapping Table ---
+    function displayMapping(courseCode) {
+        const course = findCourse(courseCode);
+        mappingTableBody.innerHTML = ''; // Clear existing table body content
+
+        if (!course) {
+            selectedCourseTitleSpan.textContent = 'Selected Course';
+             deleteCourseBtn.disabled = true;
+            const row = document.createElement('tr');
+            row.innerHTML = '<td colspan="10" style="text-align: center;">Please select a course from the dropdown above.</td>'; // Adjusted colspan
+            mappingTableBody.appendChild(row);
+             localStorage.removeItem(STORAGE_KEY_LAST_SELECTED_COURSE); // Clear last selected if none or invalid
+             addCoBtn.style.display = 'none'; // Hide Add CO button
+            toggleTableEditability(false); // Disable table editing
+            return;
+        }
+
+        selectedCourseTitleSpan.textContent = `${course.code} - ${course.title}`;
+         deleteCourseBtn.disabled = isEditingPo; // Disable if editing POs
+         localStorage.setItem(STORAGE_KEY_LAST_SELECTED_COURSE, course.code); // Save selected course code
+         addCoBtn.style.display = isEditingPo ? 'none' : ''; // Show/hide Add CO button
+
+        course.cos.forEach((co, index) => {
+            const row = createCoRow(course.code, co, index);
+            mappingTableBody.appendChild(row);
+        });
+
+         // Toggle editability of table cells and delete buttons
+         toggleTableEditability(!isEditingPo); // Pass the desired state for table editing
+    }
+
+    function createCoRow(courseCode, co, index) {
+         const row = document.createElement('tr');
+         row.dataset.coid = co.id; // Use internal ID to reference the CO
+
+         const coCodeCell = document.createElement('td');
+         coCodeCell.textContent = co.code;
+         row.appendChild(coCodeCell);
+
+         const coDescriptionCell = document.createElement('td');
+         coDescriptionCell.textContent = co.description;
+         coDescriptionCell.setAttribute('contenteditable', 'true'); // Editability controlled by toggleTableEditability
+         coDescriptionCell.dataset.type = 'co-desc';
+         coDescriptionCell.dataset.placeholder = 'Enter CO description';
+         coDescriptionCell.addEventListener('blur', handleCoEdit);
+         row.appendChild(coDescriptionCell);
+
+         for (let i = 1; i <= 7; i++) {
+             const poCode = `PO${i}`;
+             const poCell = document.createElement('td');
+             const mappingValue = courseSelect.value ? findCourse(courseSelect.value).mapping[co.id]?.[poCode] || '' : ''; // Use co.id here
+             poCell.textContent = mappingValue === '' ? '' : mappingValue; // Display 1 or 2, empty for ''
+             poCell.className = `mapping-${mappingValue === '' ? '0' : mappingValue}`; // Add class for color coding
+             poCell.setAttribute('contenteditable', 'true'); // Editability controlled by toggleTableEditability
+             poCell.dataset.type = 'po-map';
+             poCell.dataset.po = poCode; // Store the PO code
+             poCell.dataset.placeholder = '1 or 2';
+              poCell.addEventListener('blur', handleMappingEdit); // Add event listener
+             row.appendChild(poCell);
+         }
+
+         // Add delete button cell
+         const deleteCell = document.createElement('td');
+         const deleteButton = document.createElement('button');
+         deleteButton.textContent = 'X';
+         deleteButton.classList.add('delete-co-btn');
+         deleteButton.title = 'Delete this CO';
+         deleteButton.addEventListener('click', handleDeleteCo);
+         deleteCell.appendChild(deleteButton);
+         row.appendChild(deleteCell);
+
+
+         return row;
+    }
+
+    // Toggles the contenteditable state and button disabled state for the table
+    function toggleTableEditability(canEdit) {
+         mappingTableBody.querySelectorAll('tr').forEach(row => {
+             const coId = row.dataset.coid;
+             if (!coId) return; // Skip if it's the placeholder row
+
+             row.querySelectorAll('td[data-type="co-desc"]').forEach(cell => {
+                  cell.setAttribute('contenteditable', canEdit);
+                  // cell.style.outline is handled by CSS :focus and :hover now
+             });
+
+             row.querySelectorAll('td[data-type="po-map"]').forEach(cell => {
+                  cell.setAttribute('contenteditable', canEdit);
+                   // cell.style.outline is handled by CSS :focus and :hover now
+             });
+
+             row.querySelectorAll('.delete-co-btn').forEach(btn => {
+                  btn.disabled = !canEdit; // Disable delete button if not editable
+             });
+         });
+    }
+
+
+     // Handle editing of CO description
+     function handleCoEdit(event) {
+         const row = event.target.closest('tr');
+         const coId = row.dataset.coid;
+         const courseCode = courseSelect.value;
+         const course = findCourse(courseCode);
+
+         if (course && coId) {
+             const co = course.cos.find(c => c.id === coId);
+             if (co) {
+                 co.description = event.target.textContent.trim();
+                 // CO code is not editable from the table cell
+             }
+         }
+     }
+
+     // Handle editing of mapping value (1, 2, or empty)
+     function handleMappingEdit(event) {
+         const cell = event.target;
+         const row = cell.closest('tr');
+         const coId = row.dataset.coid;
+         const poCode = cell.dataset.po;
+         const courseCode = courseSelect.value;
+         const course = findCourse(courseCode);
+
+         if (course && coId && poCode) {
+             let value = cell.textContent.trim();
+
+             // Validate input: allow only '1', '2', or empty string
+             if (value !== '1' && value !== '2' && value !== '') {
+                 alert('Mapping value must be 1, 2, or empty.');
+                 // Revert to previous value or empty
+                 const previousValue = course.mapping[coId]?.[poCode] || '';
+                 cell.textContent = previousValue;
+                 value = previousValue; // Use the reverted value for updating data and class
+             }
+
+             // Ensure the mapping object exists for the CO
+             if (!course.mapping[coId]) {
+                 course.mapping[coId] = {};
+             }
+
+             // Update the data structure
+             course.mapping[coId][poCode] = value;
+
+             // Update cell class based on the new value
+             cell.className = `mapping-${value === '' ? '0' : value}`;
+         }
+     }
+
+     // Handle adding a new CO
+     function handleAddCo() {
+         const courseCode = courseSelect.value;
+         const course = findCourse(courseCode);
+
+         if (course) {
+             // Determine the next CO code (e.g., CO1, CO2, CO3...)
+             const nextCoNumber = course.cos.length + 1;
+             const newCoCode = `CO${nextCoNumber}`;
+             const newCoId = generateCoId();
+
+             const newCo = { id: newCoId, code: newCoCode, description: '' }; // Empty description initially
+             course.cos.push(newCo);
+
+             // Add mapping entry for the new CO, initialized to empty for all POs
+             course.mapping[newCoId] = {};
+             for(let i = 1; i <= 7; i++) {
+                 course.mapping[newCoId][`PO${i}`] = '';
+             }
+
+             // Add the new row to the table
+             const newRow = createCoRow(courseCode, newCo, course.cos.length - 1);
+              newRow.classList.add('add-co-row'); // Add a class to highlight the new row temporarily
+             mappingTableBody.appendChild(newRow);
+
+             // Make the new row cells editable immediately (and all others in the table)
+             toggleTableEditability(true); // Ensure table is editable when adding a CO
+
+             // Auto-focus on the description cell of the new row
+             const newCoDescCell = newRow.querySelector('td[data-type="co-desc"]');
+             if(newCoDescCell) {
+                  newCoDescCell.focus();
+             }
+
+             // Remove highlight class after a short delay
+             setTimeout(() => {
+                 newRow.classList.remove('add-co-row');
+             }, 1000);
+         }
+     }
+
+     // Handle deleting a CO
+     function handleDeleteCo(event) {
+         const row = event.target.closest('tr');
+         const coIdToDelete = row.dataset.coid;
+         const courseCode = courseSelect.value;
+         const courseIndex = findCourseIndex(courseCode);
+
+         if (courseIndex !== -1 && coIdToDelete && confirm('Are you sure you want to delete this CO?')) {
+             const course = coursesData[courseIndex];
+
+             // Find index of the CO to delete using the internal ID
+             const coIndexToDelete = course.cos.findIndex(co => co.id === coIdToDelete);
+
+             if (coIndexToDelete !== -1) {
+                 // Remove from cos array
+                 course.cos.splice(coIndexToDelete, 1);
+
+                 // Remove from mapping object
+                 delete course.mapping[coIdToDelete];
+
+                 // Update CO codes (re-number them sequentially CO1, CO2, etc.)
+                 course.cos.forEach((co, index) => {
+                     co.code = `CO${index + 1}`;
+                 });
+
+                 // Remove the row from the table
+                 row.remove();
+
+                 // Re-display the mapping to ensure updated CO codes are shown and bindings are fresh
+                 displayMapping(courseCode);
+                 showStatus(`CO ${coIndexToDelete + 1} deleted.`);
+             }
+         }
+     }
+
+
+    // --- Course Management ---
+    function showAddCourseForm() {
+        addCourseForm.style.display = 'block';
+        addCourseBtn.style.display = 'none';
+        deleteCourseBtn.style.display = 'none'; // Hide delete button when adding
+         newCourseCodeInput.value = '';
+         newCourseTitleInput.value = '';
+         newCourseCodeInput.focus();
+         // Disable course selection and table editing while adding a course
+         courseSelect.disabled = true;
+         addCoBtn.style.display = 'none';
+         toggleTableEditability(false); // Disable table editing
+         editPoDescBtn.disabled = true; // Disable PO editing
+    }
+
+    function hideAddCourseForm() {
+        addCourseForm.style.display = 'none';
+        addCourseBtn.style.display = 'inline-block';
+         deleteCourseBtn.style.display = 'inline-block'; // Show delete button again
+         deleteCourseBtn.disabled = !courseSelect.value || isEditingPo; // Re-evaluate state
+
+         // Re-enable course selection and table editing
+         courseSelect.disabled = false;
+         addCoBtn.style.display = isEditingPo ? 'none' : '';
+         toggleTableEditability(!isEditingPo); // Re-enable table editing based on PO editing state
+         editPoDescBtn.disabled = false; // Re-enable PO editing
+    }
+
+    function saveNewCourse() {
+        const code = newCourseCodeInput.value.trim();
+        const title = newCourseTitleInput.value.trim();
+
+        if (!code || !title) {
+            alert('Course Code and Title are required.');
+            return;
+        }
+
+        // Check if course code already exists (case-insensitive check)
+        if (coursesData.some(c => c.code.toLowerCase() === code.toLowerCase())) {
+            alert(`Course with code "${code}" already exists.`);
+            newCourseCodeInput.focus();
+            return;
+        }
+
+        const newCourse = {
+            code: code,
+            title: title,
+            cos: [], // Start with no COs
+            mapping: {} // Start with empty mapping
+        };
+
+        coursesData.push(newCourse);
+        // Sorting happens in populateCourseSelect
+
+        populateCourseSelect();
+        hideAddCourseForm();
+        courseSelect.value = code; // Select the newly added course
+        displayMapping(code); // Display its empty mapping
+        showStatus(`Course "${code} - ${title}" added successfully.`);
+    }
+
+     function deleteSelectedCourse() {
+          const courseCode = courseSelect.value;
+          if (!courseCode) return;
+
+          const course = findCourse(courseCode);
+
+          if (course && confirm(`Are you sure you want to delete the course "${course.code} - ${course.title}"? This cannot be undone!`)) {
+               const courseIndex = findCourseIndex(courseCode);
+               coursesData.splice(courseIndex, 1);
+               populateCourseSelect(); // Update dropdown
+               displayMapping(''); // Clear mapping area and reset UI state
+               showStatus(`Course "${course.code}" deleted.`);
+          }
+     }
+
+
+    // --- Event Listeners ---
+    courseSelect.addEventListener('change', function() {
+        const selectedCourseCode = this.value;
+        displayMapping(selectedCourseCode);
+         // deleteCourseBtn.disabled is now handled by displayMapping and togglePoEdit
+    });
+
+     addCourseBtn.addEventListener('click', showAddCourseForm);
+     cancelAddCourseBtn.addEventListener('click', hideAddCourseForm);
+     saveNewCourseBtn.addEventListener('click', saveNewCourse);
+     deleteCourseBtn.addEventListener('click', deleteSelectedCourse);
+
+    addCoBtn.addEventListener('click', handleAddCo);
+
+     editPoDescBtn.addEventListener('click', togglePoEdit);
+
+    saveDataBtn.addEventListener('click', saveData);
+    loadDataBtn.addEventListener('click', loadData);
+    clearDataBtn.addEventListener('click', clearData);
+
+    // Notes textarea change listener (optional auto-save, or rely on main save)
+    // notesTextarea.addEventListener('input', saveData); // Auto-save notes on change
+
+
+    // --- Initialize ---
+    document.addEventListener('DOMContentLoaded', () => {
+        loadData(); // Attempt to load saved data first. If fails, default data is used.
+        // loadData also handles initial UI population and state setting
+    });
+
+</script>
+
+</body>
+</html>
